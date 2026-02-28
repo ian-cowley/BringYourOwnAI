@@ -33,23 +33,11 @@ namespace BringYourOwnAI.Package
             serviceCollection.AddSingleton<HttpClient>();
 
             // Core Services
+            serviceCollection.AddSingleton<ILogService, BringYourOwnAI.Core.Services.InMemoryLogService>();
             serviceCollection.AddSingleton<ISettingsService, LocalSettingsService>();
             serviceCollection.AddSingleton<IMemoryService, MemoryService>();
             serviceCollection.AddSingleton<IConversationService, ConversationService>();
-            serviceCollection.AddSingleton<ProviderFactory>();
-            
-            // Register a default AI Provider to satisfy dependencies
-            serviceCollection.AddSingleton<IAiProvider>(sp => 
-            {
-                var factory = sp.GetRequiredService<ProviderFactory>();
-                // In a real scenario, this would load settings using ISettingsService
-                return factory.CreateProvider(new ProviderConfig 
-                { 
-                    Type = "openai", 
-                    ApiKey = "mock-key", 
-                    Model = "gpt-3.5-turbo" 
-                });
-            });
+            serviceCollection.AddSingleton<IProviderFactory, ProviderFactory>();
 
             serviceCollection.AddSingleton<IAgentOrchestrator, AgentOrchestrator>();
             serviceCollection.AddSingleton<IVsSolutionService, BringYourOwnAI.Package.Services.ExtensibilitySolutionService>();
@@ -59,6 +47,7 @@ namespace BringYourOwnAI.Package
             serviceCollection.AddTransient<BringYourOwnAI.UI.ViewModels.ConversationsViewModel>();
             serviceCollection.AddTransient<BringYourOwnAI.UI.ViewModels.SettingsViewModel>();
             serviceCollection.AddTransient<BringYourOwnAI.UI.ViewModels.MemoryViewModel>();
+            serviceCollection.AddTransient<BringYourOwnAI.UI.ViewModels.LogsViewModel>();
             serviceCollection.AddTransient<BringYourOwnAI.UI.ViewModels.MainViewModel>();
         }
     }

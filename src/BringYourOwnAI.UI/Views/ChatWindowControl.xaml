@@ -29,11 +29,11 @@
                 <!-- Sidebar Header -->
                 <StackPanel Margin="15,20,15,10">
                     <TextBlock Text="Conversations" Style="{DynamicResource HeaderText}" Margin="0,0,0,15" />
-                    <Button Style="{DynamicResource AccentButton}" HorizontalAlignment="Stretch" Command="{Binding NewConversationCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE109;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" VerticalAlignment="Center" />
-                            <TextBlock Text="New Chat" VerticalAlignment="Center" />
-                        </StackPanel>
+                    <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" 
+                             Tag="Search chats..." Margin="0,0,0,10" Height="28" />
+                    <!-- Changed New Chat Button to Icon -->
+                    <Button Style="{DynamicResource AccentButton}" HorizontalAlignment="Stretch" Command="{Binding NewConversationCommand}" ToolTip="New Chat" Height="36">
+                        <TextBlock Text="&#xE710;" Style="{DynamicResource IconGlyph}" FontSize="16" />
                     </Button>
                 </StackPanel>
 
@@ -48,11 +48,12 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="&#xE7B5;" Style="{DynamicResource IconGlyph}" FontSize="14" Opacity="0.5" Margin="0,0,10,0" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Opacity="0.9" />
+                                <!-- Explicitly setting Foreground to fix contrast -->
+                                <TextBlock Text="&#xE7B5;" Style="{DynamicResource IconGlyph}" FontSize="14" Opacity="0.5" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{DynamicResource TextPrimary}" />
+                                <TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Opacity="0.9" Foreground="{DynamicResource TextPrimary}" />
                                 <Button Grid.Column="2" Style="{DynamicResource IconButton}" Content="&#xE74D;" FontSize="12" Foreground="Gray"
                                         Command="{Binding DataContext.DeleteConversationCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" VerticalAlignment="Center" />
+                                        CommandParameter="{Binding}" VerticalAlignment="Center" ToolTip="Delete Conversation" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -113,8 +114,12 @@
                     
                     <!-- Dynamic Header Title -->
                     <Grid VerticalAlignment="Center">
-                        <TextBlock Text="BYOAI v2" Style="{DynamicResource HeaderText}" 
-                                   Visibility="{Binding IsChatActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding IsChatActive, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="BYOAI v2" Style="{DynamicResource HeaderText}" Margin="0,0,15,0" VerticalAlignment="Center" />
+                            <ComboBox MinWidth="140" Height="26" ItemsSource="{Binding Chat.AvailableModels}" SelectedItem="{Binding Chat.SelectedModel}" 
+                                      VerticalAlignment="Center" Background="{DynamicResource BackgroundElevated}" Foreground="{DynamicResource TextPrimary}" 
+                                      BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" />
+                        </StackPanel>
                         <TextBlock Text="Memory Snippets" Style="{DynamicResource HeaderText}" 
                                    Visibility="{Binding IsMemoryActive, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         <TextBlock Text="Settings" Style="{DynamicResource HeaderText}" 
@@ -230,16 +235,46 @@
                     <Grid DataContext="{Binding Settings}">
                         <ScrollViewer Padding="25">
                             <StackPanel MaxWidth="600" HorizontalAlignment="Left">
-                                <TextBlock Text="API CONFIGURATION" FontSize="10" FontWeight="Bold" Opacity="0.5" Margin="0,0,0,15" />
+                                <TextBlock Text="LLM PROVIDERS" FontSize="10" FontWeight="Bold" Opacity="0.5" Margin="0,0,0,15" />
                                 
-                                <TextBlock Text="OpenAI API Key" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
-                                <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding OpenAiKey}" Margin="0,0,0,20" />
-                                
-                                <TextBlock Text="Ollama Endpoint" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
-                                <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding OllamaEndpoint}" Margin="0,0,0,20" />
-                                
-                                <TextBlock Text="Gemini API Key" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
-                                <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding GeminiKey}" Margin="0,0,0,20" />
+                                <ItemsControl ItemsSource="{Binding Providers}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="15" Margin="0,0,0,15" Background="{DynamicResource BackgroundSidebar}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <StackPanel>
+                                                        <TextBlock Text="Name" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                                                        <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding Name}" Margin="0,0,0,10" />
+                                                        
+                                                        <TextBlock Text="Provider Type (e.g., openai, ollama, gemini)" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                                                        <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding ProviderType}" Margin="0,0,0,10" />
+                                                        
+                                                        <TextBlock Text="API Key" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                                                        <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding ApiKey}" Margin="0,0,0,10" />
+
+                                                        <TextBlock Text="Endpoint" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                                                        <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding Endpoint}" Margin="0,0,0,10" />
+
+                                                        <TextBlock Text="Model (Optional for Auto-detect)" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                                                        <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding Model}" Margin="0,0,0,0" />
+                                                    </StackPanel>
+                                                    
+                                                    <Button Grid.Column="1" Style="{DynamicResource IconButton}" Content="&#xE74D;" FontSize="14" Foreground="Gray" Margin="15,0,0,0" 
+                                                            VerticalAlignment="Top" ToolTip="Remove Provider"
+                                                            Command="{Binding DataContext.RemoveProviderCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                            CommandParameter="{Binding}" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <Button Style="{DynamicResource AccentButton}" Content="+ Add Provider" Command="{Binding AddProviderCommand}" Width="150" HorizontalAlignment="Left" Margin="0,0,0,20" />
 
                                 <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,10,0,20" />
 
@@ -250,6 +285,50 @@
                                            FontStyle="Italic" FontSize="11" Opacity="0.5" Margin="25,0,0,30" />
 
                                 <Button Style="{DynamicResource AccentButton}" Content="Save Settings" Command="{Binding SaveSettingsCommand}" Width="150" HorizontalAlignment="Left" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Grid>
+
+                <!-- Logs View -->
+                <Grid Visibility="{Binding IsLogsActive, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Grid DataContext="{Binding Logs}">
+                        <ScrollViewer Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="API LOGS &amp; DEBUGGING" FontSize="10" FontWeight="Bold" Opacity="0.5" Margin="5,0,0,15" />
+                                <ItemsControl ItemsSource="{Binding Logs}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,10" Background="{DynamicResource BackgroundSidebar}">
+                                                <StackPanel>
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding Message}" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" TextWrapping="Wrap" FontSize="13" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Timestamp, StringFormat='HH:mm:ss.fff'}" FontSize="12" Opacity="0.5" Margin="10,0,0,0" />
+                                                    </Grid>
+                                                    <TextBox Text="{Binding Payload}" IsReadOnly="True" TextWrapping="Wrap" Background="Transparent" BorderThickness="0" Margin="0,5,0,0" FontFamily="Consolas" FontSize="13" Foreground="{DynamicResource TextSecondary}">
+                                                        <TextBox.Style>
+                                                            <Style TargetType="TextBox">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Payload}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Payload}" Value="">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBox.Style>
+                                                    </TextBox>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
@@ -266,7 +345,7 @@
 
             <!-- Footer Navigation -->
             <Border Grid.Row="2" Padding="10,5" Background="{DynamicResource BackgroundSidebar}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
-                <UniformGrid Columns="3">
+                <UniformGrid Columns="4">
                     <ToggleButton Style="{DynamicResource ModernToggleButton}" IsChecked="{Binding IsChatActive, Mode=TwoWay}" Command="{Binding NavigateToChatCommand}" BorderThickness="0" Background="Transparent" Margin="2">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE8BD;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" />
@@ -283,6 +362,12 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="&#xE713;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" />
                             <TextBlock Text="Settings" />
+                        </StackPanel>
+                    </ToggleButton>
+                    <ToggleButton Style="{DynamicResource ModernToggleButton}" IsChecked="{Binding IsLogsActive, Mode=TwoWay}" Command="{Binding NavigateToLogsCommand}" BorderThickness="0" Background="Transparent" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE819;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" />
+                            <TextBlock Text="Logs" />
                         </StackPanel>
                     </ToggleButton>
                 </UniformGrid>

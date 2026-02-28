@@ -42,6 +42,32 @@ namespace BringYourOwnAI.VsIntegration
             return files;
         }
 
+        public async Task<IEnumerable<string>> SearchFilesAsync(string query)
+        {
+            var files = await GetSolutionFilesAsync();
+            var results = new List<string>();
+
+            foreach (var file in files)
+            {
+                if (!File.Exists(file) || !file.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)) continue;
+
+                try
+                {
+                    var lines = await Task.Run(() => File.ReadAllLines(file));
+                    for (int i = 0; i < lines.Length; i++)
+                    {
+                        if (lines[i].Contains(query, StringComparison.OrdinalIgnoreCase))
+                        {
+                            results.Add($"{file}:{i + 1}: {lines[i].Trim()}");
+                        }
+                    }
+                }
+                catch { /* Ignore unreadable files */ }
+            }
+
+            return results.Take(50);
+        }
+
         private IEnumerable<string> GetProjectFiles(Project project)
         {
             ThreadHelper.ThrowIfNotOnUIThread();

@@ -17,7 +17,7 @@ namespace BringYourOwnAI.Providers.Google
         private readonly string _model;
         private const string BaseUrlPattern = "https://generativelanguage.googleapis.com/v1beta/models/{0}:generateContent?key={1}";
 
-        public GoogleGeminiProvider(HttpClient httpClient, string apiKey, string model = "gemini-1.5-pro") : base(httpClient)
+        public GoogleGeminiProvider(HttpClient httpClient, string apiKey, string model = "gemini-1.5-pro", ILogService? logService = null) : base(httpClient, logService)
         {
             _apiKey = apiKey;
             _model = model;

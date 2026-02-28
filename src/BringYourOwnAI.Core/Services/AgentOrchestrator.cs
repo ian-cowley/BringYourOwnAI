@@ -11,22 +11,41 @@ namespace BringYourOwnAI.Core.Services
 {
     public class AgentOrchestrator : IAgentOrchestrator
     {
-        private readonly IAiProvider _aiProvider;
+        private readonly IProviderFactory _providerFactory;
+        private readonly ISettingsService _settingsService;
         private readonly IVsSolutionService _vsService;
         private readonly IMemoryService _memoryService;
 
         public event EventHandler<AgentProgressEventArgs>? ProgressChanged;
 
-        public AgentOrchestrator(IAiProvider aiProvider, IVsSolutionService vsService, IMemoryService memoryService)
+        public AgentOrchestrator(IProviderFactory providerFactory, ISettingsService settingsService, IVsSolutionService vsService, IMemoryService memoryService)
         {
-            _aiProvider = aiProvider;
+            _providerFactory = providerFactory;
+            _settingsService = settingsService;
             _vsService = vsService;
             _memoryService = memoryService;
         }
 
-        public async Task RunAsync(string goal, AgentContext context, CancellationToken cancellationToken = default)
+        public async Task RunAsync(string goal, AgentContext context, string? providerName = null, CancellationToken cancellationToken = default)
         {
             OnProgress("Starting Agent", $"Goal: {goal}");
+
+            var settings = await _settingsService.LoadAsync();
+            ProviderSetting? providerSetting = null;
+            if (!string.IsNullOrEmpty(providerName) && providerName != "Auto Select")
+            {
+                providerSetting = settings.Providers.FirstOrDefault(p => p.Name == providerName);
+            }
+            if (providerSetting == null && settings.Providers.Any())
+            {
+                providerSetting = settings.Providers.First();
+            }
+            if (providerSetting == null)
+            {
+                providerSetting = new ProviderSetting { ProviderType = "openai", ApiKey = "mock", Model = "gpt-4o" };
+            }
+
+            var aiProvider = _providerFactory.CreateProvider(providerSetting);
 
             // 1. Initial Planning
             context.CurrentTask = new AgentTask { Title = "Task Plan" };
@@ -38,7 +57,7 @@ namespace BringYourOwnAI.Core.Services
             };
             
             OnProgress("Planning", "Asking AI for a plan...");
-            var planJson = await _aiProvider.CompleteAsync(new[] { planMessage }, cancellationToken);
+            var planJson = await aiProvider.CompleteAsync(new[] { planMessage }, cancellationToken);
             try
             {
                 var tasks = JsonSerializer.Deserialize<List<string>>(planJson);
@@ -63,7 +82,7 @@ namespace BringYourOwnAI.Core.Services
                 // Add system prompt with latest context
                 messages.Insert(0, new ChatMessage { Role = "system", Content = BuildSystemPrompt(context) });
 
-                var response = await _aiProvider.ExecuteToolCallsAsync(messages, tools, cancellationToken);
+                var response = await aiProvider.ExecuteToolCallsAsync(messages, tools, cancellationToken);
                 
                 context.Conversation.Messages.Add(new ChatMessage { Role = "assistant", Content = response.Message });
 
@@ -104,6 +123,7 @@ namespace BringYourOwnAI.Core.Services
             yield return new ToolDefinition { Name = "read_file", Description = "Read file content", Parameters = new { path = "string" } };
             yield return new ToolDefinition { Name = "write_file", Description = "Write file content", Parameters = new { path = "string", content = "string" } };
             yield return new ToolDefinition { Name = "list_files", Description = "List solution files" };
+            yield return new ToolDefinition { Name = "search_code", Description = "Search codebase for string", Parameters = new { query = "string" } };
             yield return new ToolDefinition { Name = "run_build", Description = "Run solution build" };
         }
 
@@ -122,6 +142,9 @@ namespace BringYourOwnAI.Core.Services
                     case "list_files":
                         var files = await _vsService.GetSolutionFilesAsync();
                         return string.Join("\n", files);
+                    case "search_code":
+                        var results = await _vsService.SearchFilesAsync(args.GetProperty("query").GetString() ?? string.Empty);
+                        return results.Any() ? string.Join("\n", results) : "No results found.";
                     case "run_build":
                         await _vsService.RunBuildAsync();
                         return "Build started.";

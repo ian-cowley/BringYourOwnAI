@@ -6,13 +6,7 @@ namespace BringYourOwnAI.Core.Models
     public class Settings
     {
         [DataMember]
-        public string OpenAiKey { get; set; } = string.Empty;
-
-        [DataMember]
-        public string OllamaEndpoint { get; set; } = "http://localhost:11434";
-
-        [DataMember]
-        public string GeminiKey { get; set; } = string.Empty;
+        public System.Collections.Generic.List<ProviderSetting> Providers { get; set; } = new System.Collections.Generic.List<ProviderSetting>();
 
         [DataMember]
         public bool AutoSelectModels { get; set; } = true;

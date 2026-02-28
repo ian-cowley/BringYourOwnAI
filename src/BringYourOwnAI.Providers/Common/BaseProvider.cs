@@ -15,10 +15,12 @@ namespace BringYourOwnAI.Providers.Common
     {
         protected readonly HttpClient HttpClient;
         protected readonly JsonSerializerOptions JsonOptions;
+        protected readonly ILogService? LogService;
 
-        protected BaseProvider(HttpClient httpClient)
+        protected BaseProvider(HttpClient httpClient, ILogService? logService = null)
         {
             HttpClient = httpClient;
+            LogService = logService;
             JsonOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -81,11 +83,24 @@ namespace BringYourOwnAI.Providers.Common
             var json = JsonSerializer.Serialize(payload, JsonOptions);
             request.Content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-            var response = await HttpClient.SendAsync(request, cancellationToken);
-            response.EnsureSuccessStatusCode();
+            LogService?.Log(LogLevel.Info, $"API Request ({Name}) -> {url}", json);
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(responseJson, JsonOptions)!;
+            try
+            {
+                var response = await HttpClient.SendAsync(request, cancellationToken);
+                response.EnsureSuccessStatusCode();
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+                
+                LogService?.Log(LogLevel.Info, $"API Response ({Name}) <- {response.StatusCode}", responseJson);
+                
+                return JsonSerializer.Deserialize<T>(responseJson, JsonOptions)!;
+            }
+            catch (Exception ex)
+            {
+                LogService?.Log(LogLevel.Error, $"API Exception ({Name}) -> {url}", ex.ToString());
+                throw;
+            }
         }
     }
 }

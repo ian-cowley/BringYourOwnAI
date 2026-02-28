@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -14,12 +15,27 @@ namespace BringYourOwnAI.UI.ViewModels
     {
         private readonly IConversationService _service;
         private Conversation _selectedConversation = null!;
+        private string _searchQuery = string.Empty;
+        private System.Collections.Generic.List<Conversation> _allConversations = new System.Collections.Generic.List<Conversation>();
 
         [DataMember]
         public Conversation SelectedConversation
         {
             get => _selectedConversation;
             set => SetProperty(ref _selectedConversation, value);
+        }
+
+        [DataMember]
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                if (SetProperty(ref _searchQuery, value))
+                {
+                    ApplyFilter();
+                }
+            }
         }
 
         [DataMember]
@@ -43,8 +59,21 @@ namespace BringYourOwnAI.UI.ViewModels
         public async Task LoadAsync()
         {
             var list = await _service.GetAllAsync();
+            _allConversations.Clear();
+            _allConversations.AddRange(list);
+            ApplyFilter();
+        }
+
+        private void ApplyFilter()
+        {
             Conversations.Clear();
-            foreach (var c in list) Conversations.Add(c);
+            foreach (var c in _allConversations)
+            {
+                if (string.IsNullOrWhiteSpace(SearchQuery) || c.Title.IndexOf(SearchQuery, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    Conversations.Add(c);
+                }
+            }
         }
 
         private async Task ExecuteNewConversationAsync(object? parameter, CancellationToken cancellationToken)
@@ -69,25 +98,22 @@ namespace BringYourOwnAI.UI.ViewModels
     public partial class SettingsViewModel : ObservableObject
     {
         private readonly ISettingsService _settingsService;
-        private string _openAiKey = string.Empty;
-        private string _ollamaEndpoint = "http://localhost:11434";
-        private string _geminiKey = string.Empty;
         private bool _autoSelectModels = true;
 
         [DataMember]
-        public string OpenAiKey { get => _openAiKey; set => SetProperty(ref _openAiKey, value); }
-        
-        [DataMember]
-        public string OllamaEndpoint { get => _ollamaEndpoint; set => SetProperty(ref _ollamaEndpoint, value); }
-
-        [DataMember]
-        public string GeminiKey { get => _geminiKey; set => SetProperty(ref _geminiKey, value); }
+        public ObservableCollection<ProviderSetting> Providers { get; } = new ObservableCollection<ProviderSetting>();
 
         [DataMember]
         public bool AutoSelectModels { get => _autoSelectModels; set => SetProperty(ref _autoSelectModels, value); }
 
         [DataMember]
         public IAsyncCommand SaveSettingsCommand { get; }
+
+        [DataMember]
+        public IAsyncCommand AddProviderCommand { get; }
+
+        [DataMember]
+        public IAsyncCommand RemoveProviderCommand { get; }
 
         public SettingsViewModel(ISettingsService settingsService)
         {
@@ -97,12 +123,25 @@ namespace BringYourOwnAI.UI.ViewModels
             {
                 var settings = new Settings
                 {
-                    OpenAiKey = OpenAiKey,
-                    OllamaEndpoint = OllamaEndpoint,
-                    GeminiKey = GeminiKey,
+                    Providers = new System.Collections.Generic.List<ProviderSetting>(Providers),
                     AutoSelectModels = AutoSelectModels
                 };
                 await _settingsService.SaveAsync(settings);
+            });
+
+            AddProviderCommand = new AsyncCommand((p, c) => 
+            {
+                Providers.Add(new ProviderSetting { Id = Guid.NewGuid().ToString(), Name = "New Provider", ProviderType = "openai" });
+                return Task.CompletedTask;
+            });
+
+            RemoveProviderCommand = new AsyncCommand((p, c) => 
+            {
+                if (p is ProviderSetting provider && Providers.Contains(provider))
+                {
+                    Providers.Remove(provider);
+                }
+                return Task.CompletedTask;
             });
 
             _ = LoadSettingsAsync();
@@ -111,10 +150,16 @@ namespace BringYourOwnAI.UI.ViewModels
         private async Task LoadSettingsAsync()
         {
             var settings = await _settingsService.LoadAsync();
-            OpenAiKey = settings.OpenAiKey;
-            OllamaEndpoint = settings.OllamaEndpoint;
-            GeminiKey = settings.GeminiKey;
+            Providers.Clear();
+            if (settings.Providers != null)
+            {
+                foreach (var provider in settings.Providers)
+                {
+                    Providers.Add(provider);
+                }
+            }
             AutoSelectModels = settings.AutoSelectModels;
         }
     }
+
 }

@@ -14,10 +14,15 @@ namespace BringYourOwnAI.Core.Interfaces
         Task<ToolCallResponse> ExecuteToolCallsAsync(IEnumerable<ChatMessage> messages, IEnumerable<ToolDefinition> tools, CancellationToken cancellationToken = default);
     }
 
+    public interface IProviderFactory
+    {
+        IAiProvider CreateProvider(ProviderSetting setting);
+    }
+
     public interface IAgentOrchestrator
     {
-        Task RunAsync(string goal, AgentContext context, CancellationToken cancellationToken = default);
-        event EventHandler<AgentProgressEventArgs> ProgressChanged;
+        Task RunAsync(string goal, AgentContext context, string? providerName = null, CancellationToken cancellationToken = default);
+        event EventHandler<AgentProgressEventArgs>? ProgressChanged;
     }
 
     public class AgentContext

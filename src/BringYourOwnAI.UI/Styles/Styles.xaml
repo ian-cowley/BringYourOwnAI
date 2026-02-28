@@ -8,12 +8,12 @@
     <Color x:Key="BackgroundDeepColor">#121212</Color>
     <Color x:Key="BackgroundElevatedColor">#1E1E1E</Color>
     <Color x:Key="BackgroundSidebarColor">#181818</Color>
-    <Color x:Key="AccentPrimaryColor">#7056ff</Color> <!-- Vibrant Violet -->
-    <Color x:Key="AccentSecondaryColor">#007ACC</Color>
+    <Color x:Key="AccentPrimaryColor">#606060</Color> <!-- Slate Grey -->
+    <Color x:Key="AccentSecondaryColor">#404040</Color>
     <Color x:Key="TextPrimaryColor">#E0E0E0</Color>
     <Color x:Key="TextSecondaryColor">#A0A0A0</Color>
     <Color x:Key="BorderColor">#333333</Color>
-    <Color x:Key="UserBubbleColor">#362a7a</Color>
+    <Color x:Key="UserBubbleColor">#3A3A3A</Color> <!-- Charcoal -->
     <Color x:Key="AssistantBubbleColor">#2D2D30</Color>
 
     <SolidColorBrush x:Key="BackgroundDeep" Color="{StaticResource BackgroundDeepColor}" />
