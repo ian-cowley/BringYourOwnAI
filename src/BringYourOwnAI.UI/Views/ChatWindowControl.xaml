@@ -6,7 +6,7 @@
               xmlns:local="clr-namespace:BringYourOwnAI.UI.Views"
               mc:Ignorable="d" 
               DataType="MainViewModel">
-    <Grid Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" TextElement.Foreground="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}">
+    <Grid x:Name="RootGrid" Background="{DynamicResource BackgroundDeep}" TextElement.Foreground="{DynamicResource TextPrimary}">
         <Grid.Resources>
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </Grid.Resources>
@@ -15,174 +15,249 @@
             <ColumnDefinition Width="Auto" x:Name="SidebarColumn" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
         
-        <!-- Sidebar -->
-        <Border Grid.Column="0" Grid.RowSpan="2" Width="200" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,1,0" 
+        <!-- Sidebar Navigation -->
+        <Border Grid.Column="0" Background="{DynamicResource BackgroundSidebar}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,1,0" 
                 Visibility="{Binding Chat.IsSidebarVisible, FallbackValue=Visible, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid  DataContext="{Binding Conversations}">
+            <Grid Width="220" DataContext="{Binding Conversations}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Button Content="+ New Chat" Command="{Binding NewConversationCommand}" Margin="5" Padding="5" />
+                <!-- Sidebar Header -->
+                <StackPanel Margin="15,20,15,10">
+                    <TextBlock Text="Conversations" Style="{DynamicResource HeaderText}" Margin="0,0,0,15" />
+                    <Button Style="{DynamicResource AccentButton}" HorizontalAlignment="Stretch" Command="{Binding NewConversationCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE109;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" VerticalAlignment="Center" />
+                            <TextBlock Text="New Chat" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
 
+                <!-- Conversation List -->
                 <ListBox Grid.Row="1" ItemsSource="{Binding Conversations}" SelectedItem="{Binding SelectedConversation}"
-                         Background="Transparent" BorderThickness="0" >
+                         Style="{DynamicResource ModernListBox}" ItemContainerStyle="{DynamicResource ModernListBoxItem}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="0,5">
+                            <Grid>
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                                <Button Grid.Column="1" Content="✕" Command="{Binding DataContext.DeleteConversationCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}" Background="Transparent" Foreground="Gray" BorderThickness="0" Margin="5,0" />
+                                <TextBlock Text="&#xE7B5;" Style="{DynamicResource IconGlyph}" FontSize="14" Opacity="0.5" Margin="0,0,10,0" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Opacity="0.9" />
+                                <Button Grid.Column="2" Style="{DynamicResource IconButton}" Content="&#xE74D;" FontSize="12" Foreground="Gray"
+                                        Command="{Binding DataContext.Conversations.DeleteConversationCommand, ElementName=RootGrid}"
+                                        CommandParameter="{Binding}" VerticalAlignment="Center" />
                             </Grid>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
+
+                <!-- Sidebar Footer/Collapse -->
+                <Border Grid.Row="2" Padding="10" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+                    <Button Style="{DynamicResource IconButton}" Command="{Binding DataContext.Chat.ToggleSidebarCommand, ElementName=RootGrid}" HorizontalAlignment="Left">
+                        <TextBlock Text="&#xE700;" Style="{DynamicResource IconGlyph}" Opacity="0.7" />
+                    </Button>
+                </Border>
             </Grid>
         </Border>
 
         <!-- Main Content Area -->
-        <Grid Grid.Column="1" Grid.Row="0">
-            <!-- Chat View -->
-            <Grid Visibility="{Binding IsChatActive, Converter={StaticResource BooleanToVisibilityConverter}}" DataContext="{Binding Chat}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- View Container -->
+            <Grid Grid.Row="0" Background="{DynamicResource BackgroundDeep}">
                 
-                <!-- Header -->
-                <Border Grid.Row="0" Padding="10" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                    <DockPanel>
-                        <Button Content="☰" Command="{Binding ToggleSidebarCommand}" Background="Transparent" BorderThickness="0"  Margin="0,0,10,0" />
-                        <TextBlock Text="BYOAI v2" FontWeight="Bold"  VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding StatusText}" FontStyle="Italic" Opacity="0.7" Margin="10,0"  VerticalAlignment="Center" DockPanel.Dock="Right" />
-                    </DockPanel>
-                </Border>
+                <!-- Chat View -->
+                <Grid Visibility="{Binding IsChatActive, Converter={StaticResource BooleanToVisibilityConverter}}" DataContext="{Binding Chat}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Header -->
+                    <Border Grid.Row="0" Padding="15,12" Background="{DynamicResource BackgroundElevated}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                        <DockPanel>
+                            <Button Style="{DynamicResource IconButton}" Command="{Binding ToggleSidebarCommand}" Margin="0,0,15,0"
+                                    Visibility="{Binding IsSidebarVisible, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Inverse}">
+                                <TextBlock Text="&#xE700;" Style="{DynamicResource IconGlyph}" />
+                            </Button>
+                            <TextBlock Text="BYOAI v2" Style="{DynamicResource HeaderText}" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" VerticalAlignment="Center" Opacity="0.6">
+                                <TextBlock Text="{Binding StatusText}" FontStyle="Italic" FontSize="11" Margin="10,0" VerticalAlignment="Center" />
+                                <Ellipse Width="8" Height="8" Margin="5,0,0,0" Fill="{DynamicResource AccentPrimary}" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
 
-                <!-- Messages List -->
-                <ScrollViewer Grid.Row="1">
-                    <ItemsControl ItemsSource="{Binding Messages}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border x:Name="BubbleBorder" CornerRadius="8" Padding="10" Margin="5,3" MaxWidth="500">
-                                    <TextBlock Text="{Binding Content}" Margin="5" TextWrapping="Wrap" />
-                                </Border>
-                                <DataTemplate.Triggers>
-                                    <DataTrigger Binding="{Binding Role}" Value="user">
-                                        <Setter TargetName="BubbleBorder" Property="Background" Value="#0E639C" />
-                                        <Setter TargetName="BubbleBorder" Property="HorizontalAlignment" Value="Right" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Role}" Value="assistant">
-                                        <Setter TargetName="BubbleBorder" Property="Background" Value="#2D2D30" />
-                                        <Setter TargetName="BubbleBorder" Property="HorizontalAlignment" Value="Left" />
-                                    </DataTrigger>
-                                </DataTemplate.Triggers>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                    <!-- Messages List -->
+                    <ScrollViewer Grid.Row="1" Padding="10">
+                        <ItemsControl ItemsSource="{Binding Messages}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border x:Name="BubbleBorder" Style="{DynamicResource MessageBubbleBase}">
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Role}" FontSize="9" FontWeight="Bold" Opacity="0.4" Margin="5,0,0,2" />
+                                            <TextBlock Text="{Binding Content}" Margin="5,0" TextWrapping="Wrap" LineHeight="20" />
+                                        </StackPanel>
+                                    </Border>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Role}" Value="user">
+                                            <Setter TargetName="BubbleBorder" Property="Background" Value="#2A1F6B" />
+                                            <Setter TargetName="BubbleBorder" Property="HorizontalAlignment" Value="Right" />
+                                            <Setter TargetName="BubbleBorder" Property="CornerRadius" Value="12,12,2,12" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Role}" Value="assistant">
+                                            <Setter TargetName="BubbleBorder" Property="Background" Value="#252526" />
+                                            <Setter TargetName="BubbleBorder" Property="HorizontalAlignment" Value="Left" />
+                                            <Setter TargetName="BubbleBorder" Property="CornerRadius" Value="12,12,12,2" />
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
 
-                <!-- Input Area -->
-                <Border Grid.Row="2" Padding="10" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <TextBox Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" 
-                                 AcceptsReturn="True" MaxHeight="100" Padding="5" 
-                                   BorderThickness="0" />
-                        <Button Grid.Column="1" Content="Send" Margin="5,0,0,0" Command="{Binding SendMessageCommand}" />
-                    </Grid>
-                </Border>
-            </Grid>
-
-            <!-- Memory View -->
-            <Grid Visibility="{Binding IsMemoryActive, Converter={StaticResource BooleanToVisibilityConverter}}" DataContext="{Binding Memory}">
-                <Border Padding="20">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <TextBlock Text="Memory Snippets" FontSize="18" FontWeight="Bold"  Margin="0,0,0,10" />
-                        
-                        <Grid Grid.Row="1" Margin="0,0,0,10">
+                    <!-- Input Area -->
+                    <Border Grid.Row="2" Padding="15" Background="{DynamicResource BackgroundElevated}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"   BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
-                            <Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" Margin="5,0,0,0" Padding="10,2" />
+                            <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding InputText, UpdateSourceTrigger=PropertyChanged}" 
+                                     AcceptsReturn="True" MaxHeight="120" MinHeight="40" VerticalContentAlignment="Top"
+                                     Tag="Message shortcuts... CTRL+Enter to send" />
+                            <Button Grid.Column="1" Style="{DynamicResource AccentButton}" Margin="12,0,0,0" Command="{Binding SendMessageCommand}" VerticalAlignment="Bottom" Height="40" Padding="20,0">
+                                <TextBlock Text="&#xE724;" Style="{DynamicResource IconGlyph}" Foreground="White" />
+                            </Button>
                         </Grid>
+                    </Border>
+                </Grid>
 
-                        <ListBox Grid.Row="2" ItemsSource="{Binding Snippets}" Background="Transparent" BorderThickness="0" >
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <Border BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" BorderThickness="0,0,0,1" Padding="5">
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Title}" FontWeight="Bold" />
-                                            <TextBlock Text="{Binding Content}" MaxHeight="40" TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="10" />
+                <!-- Memory View -->
+                <Grid Visibility="{Binding IsMemoryActive, Converter={StaticResource BooleanToVisibilityConverter}}" DataContext="{Binding Memory}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Padding="20,15" Background="{DynamicResource BackgroundElevated}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="Memory Snippets" Style="{DynamicResource HeaderText}" />
+                    </Border>
+                    
+                    <Border Grid.Row="1" Padding="20,15,20,5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}" Tag="Search memory..." />
+                            <Button Grid.Column="1" Style="{DynamicResource ModernButton}" Command="{Binding SearchCommand}" Margin="10,0,0,0" Padding="15,0">
+                                <TextBlock Text="&#xE721;" Style="{DynamicResource IconGlyph}" FontSize="14" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <ListBox Grid.Row="2" ItemsSource="{Binding Snippets}" Style="{DynamicResource ModernListBox}" ItemContainerStyle="{DynamicResource ModernListBoxItem}" Margin="10">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="10">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,0,4" />
+                                        <TextBlock Text="{Binding Content}" MaxHeight="60" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Opacity="0.6" FontSize="11" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Opacity="0.4">
+                                            <TextBlock Text="&#xE12B;" Style="{DynamicResource IconGlyph}" FontSize="12" Margin="0,0,5,0" />
+                                            <TextBlock Text="{Binding CreatedAt, StringFormat=d}" FontSize="10" />
                                         </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+                <!-- Settings View -->
+                <Grid Visibility="{Binding IsSettingsActive, Converter={StaticResource BooleanToVisibilityConverter}}" DataContext="{Binding Settings}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Padding="20,15" Background="{DynamicResource BackgroundElevated}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                        <TextBlock Text="Settings" Style="{DynamicResource HeaderText}" />
+                    </Border>
+
+                    <ScrollViewer Grid.Row="1" Padding="25">
+                        <StackPanel MaxWidth="600" HorizontalAlignment="Left">
+                            <TextBlock Text="API CONFIGURATION" FontSize="10" FontWeight="Bold" Opacity="0.5" Margin="0,0,0,15" />
+                            
+                            <TextBlock Text="OpenAI API Key" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                            <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding OpenAiKey}" Margin="0,0,0,20" />
+                            
+                            <TextBlock Text="Ollama Endpoint" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                            <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding OllamaEndpoint}" Margin="0,0,0,20" />
+                            
+                            <TextBlock Text="Gemini API Key" Style="{DynamicResource ModernText}" Margin="0,0,0,5" />
+                            <TextBox Style="{DynamicResource ModernTextBox}" Text="{Binding GeminiKey}" Margin="0,0,0,20" />
+
+                            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="0,10,0,20" />
+
+                            <CheckBox IsChecked="{Binding AutoSelectModels}" Margin="0,0,0,5">
+                                <TextBlock Text="Enable Auto Model Selection" Style="{DynamicResource ModernText}" VerticalAlignment="Center" />
+                            </CheckBox>
+                            <TextBlock Text="The base model will decide which agent model to use per task." 
+                                       FontStyle="Italic" FontSize="11" Opacity="0.5" Margin="25,0,0,30" />
+
+                            <Button Style="{DynamicResource AccentButton}" Content="Save Settings" Command="{Binding SaveSettingsCommand}" Width="150" HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <!-- Overlay Busy Indicator -->
+                <Border Background="#CC000000" Visibility="{Binding Chat.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <ProgressBar IsIndeterminate="True" Width="150" Height="4" Foreground="{DynamicResource AccentPrimary}" Background="#33FFFFFF" BorderThickness="0" />
+                        <TextBlock Text="Thinking..." Style="{DynamicResource ModernText}" Margin="0,15" HorizontalAlignment="Center" Opacity="0.8" />
+                    </StackPanel>
                 </Border>
             </Grid>
 
-            <!-- Settings View -->
-            <Grid Visibility="{Binding IsSettingsActive, Converter={StaticResource BooleanToVisibilityConverter}}" DataContext="{Binding Settings}">
-                <StackPanel Margin="20">
-                    <TextBlock Text="Settings" FontSize="18" FontWeight="Bold"  Margin="0,0,0,20" />
-                    
-                    <TextBlock Text="OpenAI API Key" Foreground="Gray" Margin="0,10,0,5" />
-                    <TextBox Text="{Binding OpenAiKey}"   BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
-                    
-                    <TextBlock Text="Ollama Endpoint" Foreground="Gray" Margin="0,10,0,5" />
-                    <TextBox Text="{Binding OllamaEndpoint}"   BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
-                    
-                    <TextBlock Text="Gemini API Key" Foreground="Gray" Margin="0,10,0,5" />
-                    <TextBox Text="{Binding GeminiKey}"   BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" />
-
-                    <CheckBox IsChecked="{Binding AutoSelectModels}" Content="Enable Auto Model Selection"  Margin="0,20,0,0" />
-                    <TextBlock Text="The base model will decide which agent model to use per task." 
-                               FontStyle="Italic" FontSize="10" Foreground="Gray" Margin="20,5,0,0" />
-
-                    <Button Content="Save Settings" Command="{Binding SaveSettingsCommand}" Margin="0,30,0,0" HorizontalAlignment="Left" Padding="15,5" />
-                </StackPanel>
-            </Grid>
+            <!-- Footer Navigation -->
+            <Border Grid.Row="1" Padding="10,5" Background="{DynamicResource BackgroundSidebar}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+                <UniformGrid Columns="3">
+                    <ToggleButton Style="{DynamicResource ModernToggleButton}" IsChecked="{Binding IsChatActive}" Command="{Binding NavigateToChatCommand}" BorderThickness="0" Background="Transparent" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE8BD;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" />
+                            <TextBlock Text="Chat" />
+                        </StackPanel>
+                    </ToggleButton>
+                    <ToggleButton Style="{DynamicResource ModernToggleButton}" IsChecked="{Binding IsMemoryActive}" Command="{Binding NavigateToMemoryCommand}" BorderThickness="0" Background="Transparent" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE81C;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" />
+                            <TextBlock Text="Memory" />
+                        </StackPanel>
+                    </ToggleButton>
+                    <ToggleButton Style="{DynamicResource ModernToggleButton}" IsChecked="{Binding IsSettingsActive}" Command="{Binding NavigateToSettingsCommand}" BorderThickness="0" Background="Transparent" Margin="2">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE713;" Style="{DynamicResource IconGlyph}" Margin="0,0,8,0" />
+                            <TextBlock Text="Settings" />
+                        </StackPanel>
+                    </ToggleButton>
+                </UniformGrid>
+            </Border>
         </Grid>
-
-        <!-- Overlay Busy Indicator -->
-        <Border Grid.Column="1" Grid.Row="0" Background="#80000000" Visibility="{Binding Chat.IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <ProgressBar IsIndeterminate="True" Width="100" Height="10" />
-                <TextBlock Text="Thinking..." Margin="0,10" Foreground="White" />
-            </StackPanel>
-        </Border>
-
-        <!-- Footer Navigation -->
-        <Border Grid.Column="1" Grid.Row="1" Padding="5" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
-            <UniformGrid Columns="3">
-                <Button Content="Chat" Command="{Binding NavigateToChatCommand}" />
-                <Button Content="Memory" Command="{Binding NavigateToMemoryCommand}" />
-                <Button Content="Settings" Command="{Binding NavigateToSettingsCommand}" />
-            </UniformGrid>
-        </Border>
     </Grid>
 </DataTemplate>
 

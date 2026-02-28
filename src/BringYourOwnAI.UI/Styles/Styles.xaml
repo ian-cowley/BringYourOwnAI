@@ -4,69 +4,235 @@
     <!-- VS Dark Theme colors (hardcoded to avoid XAML compile-time dependency on VS Shell 15.0) -->
     <!-- These match the VS Dark theme. At runtime the WPF DynamicResource merging in the VS
          shell will override these if the user uses a light theme via the tool window's theming. -->
-    <SolidColorBrush x:Key="VsWindowBackground" Color="#1E1E1E" />
-    <SolidColorBrush x:Key="VsWindowText" Color="#D4D4D4" />
-    <SolidColorBrush x:Key="VsHeaderBackground" Color="#2D2D30" />
-    <SolidColorBrush x:Key="VsAccent" Color="#007ACC" />
+    <!-- Modern Dark Theme Colors -->
+    <Color x:Key="BackgroundDeepColor">#121212</Color>
+    <Color x:Key="BackgroundElevatedColor">#1E1E1E</Color>
+    <Color x:Key="BackgroundSidebarColor">#181818</Color>
+    <Color x:Key="AccentPrimaryColor">#7056ff</Color> <!-- Vibrant Violet -->
+    <Color x:Key="AccentSecondaryColor">#007ACC</Color>
+    <Color x:Key="TextPrimaryColor">#E0E0E0</Color>
+    <Color x:Key="TextSecondaryColor">#A0A0A0</Color>
+    <Color x:Key="BorderColor">#333333</Color>
+    <Color x:Key="UserBubbleColor">#362a7a</Color>
+    <Color x:Key="AssistantBubbleColor">#2D2D30</Color>
 
-    <!-- Base bubble style -->
-    <Style x:Key="MessageBubbleBase" TargetType="Border">
-        <Setter Property="CornerRadius" Value="8" />
-        <Setter Property="Padding" Value="10" />
-        <Setter Property="Margin" Value="5,3" />
-        <Setter Property="MaxWidth" Value="500" />
+    <SolidColorBrush x:Key="BackgroundDeep" Color="{StaticResource BackgroundDeepColor}" />
+    <SolidColorBrush x:Key="BackgroundElevated" Color="{StaticResource BackgroundElevatedColor}" />
+    <SolidColorBrush x:Key="BackgroundSidebar" Color="{StaticResource BackgroundSidebarColor}" />
+    <SolidColorBrush x:Key="AccentPrimary" Color="{StaticResource AccentPrimaryColor}" />
+    <SolidColorBrush x:Key="TextPrimary" Color="{StaticResource TextPrimaryColor}" />
+    <SolidColorBrush x:Key="TextSecondary" Color="{StaticResource TextSecondaryColor}" />
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}" />
+
+    <!-- Typography -->
+    <Style x:Key="ModernText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="FontFamily" Value="Segoe UI, Roboto, Inter" />
     </Style>
 
-    <!-- User message bubble (right-aligned, blue) -->
-    <Style x:Key="UserBubble" TargetType="Border" BasedOn="{StaticResource MessageBubbleBase}">
-        <Setter Property="Background" Value="#0E639C" />
+    <Style x:Key="HeaderText" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="FontFamily" Value="Segoe UI, Roboto, Inter" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+
+    <Style x:Key="IconGlyph" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+
+    <!-- Bubbles -->
+    <Style x:Key="MessageBubbleBase" TargetType="Border">
+        <Setter Property="CornerRadius" Value="12" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="10,6" />
+        <Setter Property="MaxWidth" Value="550" />
+    </Style>
+
+    <Style x:Key="UserBubble" TargetType="Border">
+        <Setter Property="CornerRadius" Value="12,12,2,12" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="10,6" />
+        <Setter Property="MaxWidth" Value="550" />
+        <Setter Property="Background" Value="{StaticResource UserBubbleColor}" />
         <Setter Property="HorizontalAlignment" Value="Right" />
     </Style>
 
-    <!-- Assistant message bubble (left-aligned, dark grey) -->
-    <Style x:Key="AssistantBubble" TargetType="Border" BasedOn="{StaticResource MessageBubbleBase}">
-        <Setter Property="Background" Value="#2D2D30" />
+    <Style x:Key="AssistantBubble" TargetType="Border">
+        <Setter Property="CornerRadius" Value="12,12,12,2" />
+        <Setter Property="Padding" Value="12,10" />
+        <Setter Property="Margin" Value="10,6" />
+        <Setter Property="MaxWidth" Value="550" />
+        <Setter Property="Background" Value="{StaticResource AssistantBubbleColor}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 
-    <!-- Sidebar list item style -->
-    <Style x:Key="ConversationListItem" TargetType="ListBoxItem">
-        <Setter Property="Foreground" Value="#D4D4D4" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Padding" Value="8,5" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Style.Triggers>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="#094771" />
-            </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#3F3F46" />
-            </Trigger>
-        </Style.Triggers>
+    <!-- Buttons -->
+    <Style x:Key="ModernButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource BackgroundElevated}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#2D2D30" />
+                            <Setter Property="BorderBrush" Value="{StaticResource AccentPrimary}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
-    <!-- Flat send button style -->
-    <Style x:Key="SendButton" TargetType="Button">
-        <Setter Property="Background" Value="#007ACC" />
-        <Setter Property="Foreground" Value="White" />
+    <Style x:Key="AccentButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource AccentPrimary}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Padding" Value="12,6" />
         <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="Padding" Value="14,7" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}"
-                            CornerRadius="4"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6"
                             Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#1177BB" />
+                            <Setter Property="Background" Value="#826DFF" />
                         </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#005A9E" />
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="IconButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Padding" Value="5" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#20FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ModernToggleButton" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Padding" Value="10,5" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" 
+                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#15FFFFFF" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#257056FF" />
+                            <Setter Property="Foreground" Value="{StaticResource AccentPrimary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ListBox -->
+    <Style x:Key="ModernListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+
+    <Style x:Key="ModernListBoxItem" TargetType="ListBoxItem">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="Margin" Value="4,2" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#257056FF" />
+                            <Setter Property="Foreground" Value="{StaticResource AccentPrimary}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#15FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Inputs -->
+    <Style x:Key="ModernTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="{StaticResource BackgroundDeep}" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="CaretBrush" Value="{StaticResource AccentPrimary}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}" 
+                            CornerRadius="6">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter Property="BorderBrush" Value="{StaticResource AccentPrimary}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
