@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>BringYourOwnAI.UI</RootNamespace>
+    <IsExtensibilityProject>false</IsExtensibilityProject>
+    <CreateVsixContainer>false</CreateVsixContainer>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BringYourOwnAI.Core\BringYourOwnAI.Core.csproj" />
+    <ProjectReference Include="..\BringYourOwnAI.Providers\BringYourOwnAI.Providers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility" Version="17.10.2084" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.10.2084" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Markdig.Wpf" Version="0.5.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Convert all XAML into Embedded Resources for Remote UI hydration -->
+    <EmbeddedResource Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+    <Page Remove="**\*.xaml" />
+    <!-- Never compile code-behind in Remote UI -->
+    <Compile Remove="**\*.xaml.cs" />
+  </ItemGroup>
+
+</Project>

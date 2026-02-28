@@ -1,0 +1,41 @@
+## [Visual Studio](https://aka.ms/vs-gitignore)
+.vs/
+
+## Build results
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userossc
+*.sln.docstates
+
+## Visual Studio 2015/2017 cache directories
+.mfractor/
+
+## Node.js / NPM
+node_modules/
+
+## Temporary files and logs
+*.log
+stderr.txt
+stdout.txt
+*.tmp
+
+## Sensitive information (common patterns)
+*.pem
+*.key
+*.pfx
+.env
+.env.*
+
+## Project specific removals
+diag_build.log
+msbuild.log
+package_build.log
+vsix_build.log
+"Implementation Plan_modernizing,md"

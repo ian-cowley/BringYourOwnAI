@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseWpf>true</UseWpf>
+    <RootNamespace>BringYourOwnAI.Package</RootNamespace>
+    <AssemblyName>BringYourOwnAI.Package</AssemblyName>
+    <GenerateVsix>true</GenerateVsix>
+    <VisualStudioExtensibilityProject>true</VisualStudioExtensibilityProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40608" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40608-preview1" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\BringYourOwnAI.Core\BringYourOwnAI.Core.csproj" />
+    <ProjectReference Include="..\BringYourOwnAI.Providers\BringYourOwnAI.Providers.csproj" />
+    <ProjectReference Include="..\BringYourOwnAI.UI\BringYourOwnAI.UI.csproj" />
+  </ItemGroup>
+
+</Project>

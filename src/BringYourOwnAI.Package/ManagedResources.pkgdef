@@ -1,0 +1,7 @@
+// BringYourOwnAI Package — supplemental registration
+// Tells VS to use managed (embedded) resources for the command table
+// instead of Win32 native resources. Required because VSSDK.BuildTools 17.x
+// does not emit this key from [PackageRegistration(UseManagedResourcesOnly=true)].
+
+[$RootKey$\Packages\{202c3821-6b07-4286-9a2c-9801f9640987}]
+"ManagedResourcesOnly"=dword:00000001

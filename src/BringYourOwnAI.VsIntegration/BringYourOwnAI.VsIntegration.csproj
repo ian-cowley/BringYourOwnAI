@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\BringYourOwnAI.Core\BringYourOwnAI.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ProjectGuid>{C3D4E5F6-A7B8-49C0-D1E2-F3A4B5C6D7E8}</ProjectGuid>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EnvDTE and EnvDTE80 are provided transitively by Microsoft.VisualStudio.SDK at the correct v17 version -->
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.31902.203" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.0.1597">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

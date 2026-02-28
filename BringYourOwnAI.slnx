@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BringYourOwnAI.Core/BringYourOwnAI.Core.csproj" />
+    <Project Path="src/BringYourOwnAI.Providers/BringYourOwnAI.Providers.csproj" />
+    <Project Path="src/BringYourOwnAI.UI/BringYourOwnAI.UI.csproj" />
+    <Project Path="src/BringYourOwnAI.VsIntegration/BringYourOwnAI.VsIntegration.csproj" />
+    <Project Path="src/BringYourOwnAI.Package/BringYourOwnAI.Package.csproj" Id="4a0915e5-88a9-4c41-b88e-986f9a2a619d" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BringYourOwnAI.Tests/BringYourOwnAI.Tests.csproj" />
+  </Folder>
+</Solution>
