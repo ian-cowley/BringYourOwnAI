@@ -85,7 +85,7 @@ namespace BringYourOwnAI.Providers.Common
             response.EnsureSuccessStatusCode();
 
             var responseJson = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(responseJson, JsonOptions);
+            return JsonSerializer.Deserialize<T>(responseJson, JsonOptions)!;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace BringYourOwnAI.VsIntegration
 {
     public class VsSolutionService : IVsSolutionService
     {
-        private DTE2 _dte;
+        private DTE2 _dte = null!;
         private readonly IServiceProvider _serviceProvider;
 
         public VsSolutionService(IServiceProvider serviceProvider)
@@ -24,7 +24,7 @@ namespace BringYourOwnAI.VsIntegration
         private DTE2 GetDte()
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            return _dte ??= _serviceProvider.GetService(typeof(DTE)) as DTE2;
+            return _dte ??= (_serviceProvider.GetService(typeof(DTE)) as DTE2)!;
         }
 
         public async Task<IEnumerable<string>> GetSolutionFilesAsync()

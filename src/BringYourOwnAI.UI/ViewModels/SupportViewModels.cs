@@ -13,7 +13,7 @@ namespace BringYourOwnAI.UI.ViewModels
     public partial class ConversationsViewModel : ObservableObject
     {
         private readonly IConversationService _service;
-        private Conversation _selectedConversation;
+        private Conversation _selectedConversation = null!;
 
         [DataMember]
         public Conversation SelectedConversation

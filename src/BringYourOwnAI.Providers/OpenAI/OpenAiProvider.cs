@@ -34,7 +34,7 @@ namespace BringYourOwnAI.Providers.OpenAI
             };
 
             var response = await PostAsync<JsonElement>(BaseUrl, payload, _apiKey, cancellationToken);
-            return response.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
+            return response.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString()!;
         }
 
         public override async Task<ToolCallResponse> ExecuteToolCallsAsync(IEnumerable<ChatMessage> messages, IEnumerable<ToolDefinition> tools, CancellationToken cancellationToken = default)
@@ -62,7 +62,7 @@ namespace BringYourOwnAI.Providers.OpenAI
 
             var result = new ToolCallResponse
             {
-                Message = message.TryGetProperty("content", out var content) ? content.GetString() : string.Empty
+                Message = message.TryGetProperty("content", out var content) ? content.GetString() ?? string.Empty : string.Empty
             };
 
             if (message.TryGetProperty("tool_calls", out var toolCalls))
@@ -71,9 +71,9 @@ namespace BringYourOwnAI.Providers.OpenAI
                 {
                     result.ToolCalls.Add(new ToolCall
                     {
-                        Id = toolCall.GetProperty("id").GetString(),
-                        Name = toolCall.GetProperty("function").GetProperty("name").GetString(),
-                        Arguments = toolCall.GetProperty("function").GetProperty("arguments").GetString()
+                        Id = toolCall.GetProperty("id").GetString()!,
+                        Name = toolCall.GetProperty("function").GetProperty("name").GetString()!,
+                        Arguments = toolCall.GetProperty("function").GetProperty("arguments").GetString()!
                     });
                 }
             }

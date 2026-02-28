@@ -82,7 +82,7 @@ namespace BringYourOwnAI.Core.Services
                 s.Tags.Any(t => t.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0));
         }
 
-        private async Task<MemorySnippet> LoadFromFileAsync(string path)
+        private async Task<MemorySnippet?> LoadFromFileAsync(string path)
         {
             try
             {

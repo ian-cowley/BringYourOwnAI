@@ -37,8 +37,8 @@ namespace BringYourOwnAI.Providers.Google
                 })
             };
 
-            var response = await PostAsync<JsonElement>(url, payload, null, cancellationToken);
-            return response.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString();
+            var response = await PostAsync<JsonElement>(url, payload, string.Empty, cancellationToken);
+            return response.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString()!;
         }
 
         public override async Task<ToolCallResponse> ExecuteToolCallsAsync(IEnumerable<ChatMessage> messages, IEnumerable<ToolDefinition> tools, CancellationToken cancellationToken = default)
