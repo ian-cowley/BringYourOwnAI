@@ -37,6 +37,14 @@
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
 
+    <Style x:Key="AutoHeaderTextStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="FontFamily" Value="Segoe UI, Roboto, Inter" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Text" Value="BYOAI v2" />
+    </Style>
+
     <Style x:Key="IconGlyph" TargetType="TextBlock">
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
@@ -175,6 +183,30 @@
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="border" Property="Background" Value="#257056FF" />
                             <Setter Property="Foreground" Value="{StaticResource AccentPrimary}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SidebarToggleButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+        <Setter Property="Padding" Value="5" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="6"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#20FFFFFF" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

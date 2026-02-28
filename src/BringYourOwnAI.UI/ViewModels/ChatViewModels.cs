@@ -23,9 +23,50 @@ namespace BringYourOwnAI.UI.ViewModels
         private bool _isMemoryActive;
 
         [DataMember] public bool IsBusy { get => _isBusy; set => SetProperty(ref _isBusy, value); }
-        [DataMember] public bool IsChatActive { get => _isChatActive; set => SetProperty(ref _isChatActive, value); }
-        [DataMember] public bool IsSettingsActive { get => _isSettingsActive; set => SetProperty(ref _isSettingsActive, value); }
-        [DataMember] public bool IsMemoryActive { get => _isMemoryActive; set => SetProperty(ref _isMemoryActive, value); }
+        [DataMember] 
+        public bool IsChatActive 
+        { 
+            get => _isChatActive; 
+            set 
+            {
+                if (SetProperty(ref _isChatActive, value) && value)
+                {
+                    IsSettingsActive = false;
+                    IsMemoryActive = false;
+                    CurrentView = Chat;
+                }
+            }
+        }
+
+        [DataMember] 
+        public bool IsSettingsActive 
+        { 
+            get => _isSettingsActive; 
+            set 
+            {
+                if (SetProperty(ref _isSettingsActive, value) && value)
+                {
+                    IsChatActive = false;
+                    IsMemoryActive = false;
+                    CurrentView = Settings;
+                }
+            }
+        }
+
+        [DataMember] 
+        public bool IsMemoryActive 
+        { 
+            get => _isMemoryActive; 
+            set 
+            {
+                if (SetProperty(ref _isMemoryActive, value) && value)
+                {
+                    IsChatActive = false;
+                    IsSettingsActive = false;
+                    CurrentView = Memory;
+                }
+            }
+        }
 
         private ObservableObject _currentView;
 
@@ -106,6 +147,14 @@ namespace BringYourOwnAI.UI.ViewModels
             _vsService = vsService;
             Conversations = conversations;
             _orchestrator.ProgressChanged += (s, e) => StatusText = $"{e.Status}: {e.Detail}";
+            
+            Conversations.PropertyChanged += async (s, e) =>
+            {
+                if (e.PropertyName == nameof(Conversations.SelectedConversation) && Conversations.SelectedConversation != null)
+                {
+                    await LoadConversationAsync(Conversations.SelectedConversation.Id);
+                }
+            };
 
             ToggleSidebarCommand = new AsyncCommand((p, c) => { IsSidebarVisible = !IsSidebarVisible; return Task.CompletedTask; });
             SendMessageCommand = new AsyncCommand(ExecuteSendMessageAsync);

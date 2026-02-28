@@ -68,6 +68,7 @@ namespace BringYourOwnAI.UI.ViewModels
     [DataContract]
     public partial class SettingsViewModel : ObservableObject
     {
+        private readonly ISettingsService _settingsService;
         private string _openAiKey = string.Empty;
         private string _ollamaEndpoint = "http://localhost:11434";
         private string _geminiKey = string.Empty;
@@ -88,13 +89,32 @@ namespace BringYourOwnAI.UI.ViewModels
         [DataMember]
         public IAsyncCommand SaveSettingsCommand { get; }
 
-        public SettingsViewModel()
+        public SettingsViewModel(ISettingsService settingsService)
         {
-            SaveSettingsCommand = new AsyncCommand((p, c) => 
+            _settingsService = settingsService;
+            
+            SaveSettingsCommand = new AsyncCommand(async (p, c) => 
             {
-                // Persistence logic here
-                return Task.CompletedTask;
+                var settings = new Settings
+                {
+                    OpenAiKey = OpenAiKey,
+                    OllamaEndpoint = OllamaEndpoint,
+                    GeminiKey = GeminiKey,
+                    AutoSelectModels = AutoSelectModels
+                };
+                await _settingsService.SaveAsync(settings);
             });
+
+            _ = LoadSettingsAsync();
+        }
+
+        private async Task LoadSettingsAsync()
+        {
+            var settings = await _settingsService.LoadAsync();
+            OpenAiKey = settings.OpenAiKey;
+            OllamaEndpoint = settings.OllamaEndpoint;
+            GeminiKey = settings.GeminiKey;
+            AutoSelectModels = settings.AutoSelectModels;
         }
     }
 }

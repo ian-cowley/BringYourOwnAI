@@ -33,6 +33,7 @@ namespace BringYourOwnAI.Package
             serviceCollection.AddSingleton<HttpClient>();
 
             // Core Services
+            serviceCollection.AddSingleton<ISettingsService, LocalSettingsService>();
             serviceCollection.AddSingleton<IMemoryService, MemoryService>();
             serviceCollection.AddSingleton<IConversationService, ConversationService>();
             serviceCollection.AddSingleton<ProviderFactory>();
@@ -41,6 +42,7 @@ namespace BringYourOwnAI.Package
             serviceCollection.AddSingleton<IAiProvider>(sp => 
             {
                 var factory = sp.GetRequiredService<ProviderFactory>();
+                // In a real scenario, this would load settings using ISettingsService
                 return factory.CreateProvider(new ProviderConfig 
                 { 
                     Type = "openai", 

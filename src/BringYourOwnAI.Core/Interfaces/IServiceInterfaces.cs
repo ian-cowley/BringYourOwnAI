@@ -21,4 +21,10 @@ namespace BringYourOwnAI.Core.Interfaces
         Task DeleteAsync(string id);
         Task<Conversation> CreateNewAsync();
     }
+
+    public interface ISettingsService
+    {
+        Task<Settings> LoadAsync();
+        Task SaveAsync(Settings settings);
+    }
 }
